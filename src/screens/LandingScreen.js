@@ -8,20 +8,28 @@ const LandingScreen = () => {
     const inputRef = useRef();
     const [imageLink, setImageLink] = useState();
 
-    const baseUrl = 'https://api.unsplash.com/search/photos?per_page=1&query='
+    const url = "https://api-inference.huggingface.co/models/prompthero/openjourney-v4";
 
     function clickHandler(){
-        console.log(inputRef.current.value);
-        const options = {
-            method: "get",
-            url : `${baseUrl}${inputRef.current.value}&client_id=${data.access_key}`,
+
+        const data = {
+            "input": `${inputRef.current.value}`
         }
 
-        axios(options)
-        .then((res)=>{
-            console.log(res.data.results[0].urls.regular)
-            setImageLink(res.data.results[0].urls.regular);
+
+        axios.post(url,{
+            inputs:JSON.stringify(data)
+        },{
+            headers:{
+                Autherization: data.access_token
+            },
+            responseType: "blob"
         })
+        .then((res)=>{
+            const image = URL.createObjectURL(res.data);
+            setImageLink(image)
+        })
+
     }
   return (
     <div id='container'>
